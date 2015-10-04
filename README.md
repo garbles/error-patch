@@ -11,4 +11,6 @@ errorPatch(error => {
   // handle the error object
   someLoggerFunction(error)
 })
+
+throw new Error('ERRRRORRRRR!!!')
 ```
