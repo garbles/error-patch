@@ -1,0 +1,25 @@
+{
+  "name": "error-patch",
+  "homepage": "https://github.com/garbles/error-patch",
+  "authors": [
+    "Gabe Scholz <gabe@brewhouse.io>"
+  ],
+  "description": "Patch all error classes so that you can run them through a callback before throwing.",
+  "main": "dist/index.js",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "error",
+    "patch"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
