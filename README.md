@@ -14,3 +14,7 @@ errorPatch(error => {
 
 throw new Error('ERRRRORRRRR!!!')
 ```
+
+### !!
+
+This is a fun experiment and you should probably just use `window.onerror`.
