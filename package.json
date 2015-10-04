@@ -1,0 +1,30 @@
+{
+  "name": "error-patch",
+  "version": "0.0.0",
+  "description": "A patched error object to catch all errors",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel -d lib src",
+    "test": "babel-node test/index.js",
+    "release": "npm test && npm run build && npm version patch && git push origin master --tags && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garbles/error-patch.git"
+  },
+  "keywords": [
+    "error",
+    "patch",
+    "catch"
+  ],
+  "author": "Gabe Scholz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/garbles/error-patch/issues"
+  },
+  "homepage": "https://github.com/garbles/error-patch#readme",
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "tape": "^4.2.1"
+  }
+}
