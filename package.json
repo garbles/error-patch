@@ -4,9 +4,10 @@
   "description": "A patched error object to catch all errors",
   "main": "lib/index.js",
   "scripts": {
+    "bundle": "browserify -s errorPatch src/index.js > dist/index.js",
     "build": "babel -d lib src",
     "test": "babel-node test/index.js",
-    "release": "npm test && npm run build && npm version patch && git push origin master --tags && npm publish"
+    "release": "npm test && npm run build && npm run bundle && npm version patch && git push origin master --tags && npm publish"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
   "homepage": "https://github.com/garbles/error-patch#readme",
   "devDependencies": {
     "babel": "^5.8.23",
+    "browserify": "^11.2.0",
     "tape": "^4.2.1"
   }
 }
