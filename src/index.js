@@ -8,6 +8,14 @@ const ERROR_TYPES = [
   `URIError`
 ]
 
+const CALLBACK_KEY = `__PATCH_CALLBACK_FN__`
+const PARENT_KEY = `__PATCH_PARENT_CONSTRUCTOR__`
+const REVERT_KEY = `__PATCH_REVERT_FN__`
+
+function revert () {
+  global[this.name] = this[PARENT_KEY]
+}
+
 function evalErrorClass (type, callback) {
   eval.call(null, `
     var constructor = ${type};
@@ -18,17 +26,19 @@ function evalErrorClass (type, callback) {
         this.message = message;
         this.fileName = fileName;
         this.stack = (new constructor(message, fileName, lineNumber)).stack;
-        Patched.__callback__(this);
+        Patched.${CALLBACK_KEY}(this);
       }
 
       ${type}.prototype = prototype;
       ${type}.prototype.constructor = ${type};
+      ${type}.${PARENT_KEY} = constructor;
 
       return ${type};
     }());
   `)
 
-  Patched.__callback__ = callback;
+  Patched[REVERT_KEY] = revert
+  Patched[CALLBACK_KEY] = callback
 
   return Patched
 }
@@ -40,6 +50,14 @@ module.exports = function errorPatch (callback, _types) {
 
   while (++i < len) {
     const type = types[i]
+    const constructor = eval(type)
+
+    if (constructor[REVERT_KEY]) {
+      constructor[REVERT_KEY]()
+    }
+
     global[type] = evalErrorClass(type, callback)
   }
+
+  return true
 }

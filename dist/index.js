@@ -4,10 +4,19 @@
 
 var ERROR_TYPES = ["Error", "EvalError", "RangeError", "ReferenceError", "SyntaxError", "TypeError", "URIError"];
 
-function evalErrorClass(type, callback) {
-  eval.call(null, "\n    var constructor = " + type + ";\n    var prototype = constructor.prototype;\n\n    var Patched = (function () {\n      function " + type + " (message, fileName, lineNumber) {\n        this.message = message;\n        this.fileName = fileName;\n        this.stack = (new constructor(message, fileName, lineNumber)).stack;\n        Patched.__callback__(this);\n      }\n\n      " + type + ".prototype = prototype;\n      " + type + ".prototype.constructor = " + type + ";\n\n      return " + type + ";\n    }());\n  ");
+var CALLBACK_KEY = "__PATCH_CALLBACK_FN__";
+var PARENT_KEY = "__PATCH_PARENT_CONSTRUCTOR__";
+var REVERT_KEY = "__PATCH_REVERT_FN__";
 
-  Patched.__callback__ = callback;
+function revert() {
+  global[this.name] = this[PARENT_KEY];
+}
+
+function evalErrorClass(type, callback) {
+  eval.call(null, "\n    var constructor = " + type + ";\n    var prototype = constructor.prototype;\n\n    var Patched = (function () {\n      function " + type + " (message, fileName, lineNumber) {\n        this.message = message;\n        this.fileName = fileName;\n        this.stack = (new constructor(message, fileName, lineNumber)).stack;\n        Patched." + CALLBACK_KEY + "(this);\n      }\n\n      " + type + ".prototype = prototype;\n      " + type + ".prototype.constructor = " + type + ";\n      " + type + "." + PARENT_KEY + " = constructor;\n\n      return " + type + ";\n    }());\n  ");
+
+  Patched[REVERT_KEY] = revert;
+  Patched[CALLBACK_KEY] = callback;
 
   return Patched;
 }
@@ -19,8 +28,16 @@ module.exports = function errorPatch(callback, _types) {
 
   while (++i < len) {
     var type = types[i];
+    var _constructor = eval(type);
+
+    if (_constructor[REVERT_KEY]) {
+      _constructor[REVERT_KEY]();
+    }
+
     global[type] = evalErrorClass(type, callback);
   }
+
+  return true;
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
